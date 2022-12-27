@@ -1,24 +1,24 @@
 use std::collections::HashMap;
 
-struct Node {
+pub struct Node {
     // type of the node element
-    node_type: NodeType,
+    pub(crate) node_type: NodeType,
     // the children of the node in the tree
-    children: Vec<Node>
+    pub(crate) children: Vec<Node>
 }
 
 // type string or element
-enum NodeType {
+pub enum NodeType {
     Text(String),
     Element(ElementData)
 }
 
-struct ElementData {
-    tag_name: String,
-    attributes: AttrMap
+pub struct ElementData {
+    pub(crate) tag_name: String,
+    pub(crate) attributes: AttrMap
 }
 
-type AttrMap = HashMap<String, String>;
+pub type AttrMap = HashMap<String, String>;
 
 // constructor function for text node
 fn text(data: String) -> Node {

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+use crate::dom;
 
 struct Parser {
     // counter position
@@ -41,5 +43,31 @@ impl Parser {
     fn consume_whitespace(&mut self) {
         // note, im using char and not CharExt as Im not sure of the namespace
         self.consume_while(char::is_whitespace);
+    }
+
+    // a method to parse tag name
+    fn parse_tag_name(&mut self) -> String {
+        self.consume_while(
+            |c| match c {
+                'a'..='z' | 'A'..='Z' | '0'..='9' => true,
+                _ => false
+            }
+        )
+    }
+
+    // a method to actually parse a tag
+    fn parse_tag(&mut self) -> dom::Node {
+        assert_eq!(self.consume_char(), '<');
+        return dom::Node {
+            node_type: dom::NodeType::Element(
+                dom::ElementData {
+                    tag_name: self.parse_tag_name(),
+                    // todo: attributes should be parsed from the tag
+                    attributes: HashMap::new()
+                }
+            ),
+            // todo: the children should be derived from parsing sub tags
+            children: Vec::new()
+        }
     }
 }
