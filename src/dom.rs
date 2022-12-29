@@ -29,7 +29,7 @@ fn text(data: String) -> Node {
 }
 
 // constructor fn for element node
-fn elem(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
+pub fn element_constructor(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
     Node {
         node_type: NodeType::Element(
             ElementData {

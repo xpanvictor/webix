@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::dom;
+use crate::dom::{AttrMap, element_constructor};
 
 struct Parser {
     // counter position
@@ -58,16 +59,45 @@ impl Parser {
     // a method to actually parse a tag
     fn parse_tag(&mut self) -> dom::Node {
         assert_eq!(self.consume_char(), '<');
-        return dom::Node {
-            node_type: dom::NodeType::Element(
-                dom::ElementData {
-                    tag_name: self.parse_tag_name(),
-                    // todo: attributes should be parsed from the tag
-                    attributes: HashMap::new()
-                }
-            ),
-            // todo: the children should be derived from parsing sub tags
-            children: Vec::new()
+        // use a loop to make children
+        let children = Vec::new();
+        let tag_name = self.parse_tag_name();
+        self.consume_char();
+        // fetch all attributes
+        let attrs = self.parse_attributes();
+        // ensure end of tag
+        assert_eq!(self.consume_char(), '>');
+        // now let's take all the children
+        return element_constructor(tag_name, attrs, children)
+    }
+
+    // a method to parse attributes
+    fn parse_attr(&mut self) -> (String, String) {
+        let key = self.consume_while(
+            |c| match c {
+                '=' => true,
+                _ => false
+            }
+        );
+        let value = self.consume_while(
+            |c| match c {
+                ' ' => true,
+                _ => false
+            }
+        );
+        return (key, value)
+    }
+
+    // a method to parse all the attributes
+    fn parse_attributes(&mut self) -> AttrMap {
+        let mut attributes = HashMap::new();
+        loop {
+            if (self.consume_char() == '>') {
+                break;
+            }
+            let (key, value) = self.parse_attr();
+            attributes.insert(key, value);
         }
+        return attributes
     }
 }
