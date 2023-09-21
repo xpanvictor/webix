@@ -1,42 +1,42 @@
 use std::collections::HashMap;
-
-pub struct Node {
-    // type of the node element
-    pub(crate) node_type: NodeType,
-    // the children of the node in the tree
-    pub(crate) children: Vec<Node>
-}
-
-// type string or element
-pub enum NodeType {
+enum NodeType {
     Text(String),
     Element(ElementData)
 }
 
-pub struct ElementData {
-    pub(crate) tag_name: String,
-    pub(crate) attributes: AttrMap
+struct ElementData {
+    tagName: String,
+    attributes: AttrMap
 }
 
-pub type AttrMap = HashMap<String, String>;
+type AttrMap = HashMap<String, String>;
 
-// constructor function for text node
+#[derive(Debug)]
+struct Node {
+    // children under this node
+    children: Vec<Node>,
+    // the type of node this is
+    nodeType: NodeType
+}
+
 fn text(data: String) -> Node {
+    Node { children: Vec::new(), nodeType: NodeType::Text(data) }
+}
+
+fn elem(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
     Node {
-        node_type: NodeType::Text(data),
-        children: Vec::new()
+        children,
+        nodeType: NodeType::Element(
+            ElementData {
+                attributes: attrs,
+                tagName: name
+            }
+        )
     }
 }
 
-// constructor fn for element node
-pub fn element_constructor(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
-    Node {
-        node_type: NodeType::Element(
-            ElementData {
-                tag_name: name,
-                attributes: attrs
-            }
-        ),
-        children: children
+impl Node {
+    fn pretty_print(&self) {
+        println!("{:#?}", self)
     }
 }
