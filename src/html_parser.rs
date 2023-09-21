@@ -1,4 +1,4 @@
-
+use std::collections::HashMap;
 use crate::dom;
 
 struct Parser {
@@ -8,6 +8,18 @@ struct Parser {
 
 impl Parser {
     /// Methods for working with the file
+
+    fn parse(source: String) -> dom::Node {
+        let mut nodes = Parser { pos: 0, input: source }.parse_nodes();
+
+        // return if just root node inside
+        if nodes.len() == 1 {
+            nodes.swap_remove(0)
+        } else {
+            dom::elem("html".to_string(), HashMap::new(), nodes)
+        }
+    }
+
     // Read next char without consuming
     fn next_char(&self) -> char {
         self.input[self.pos..].chars().next().unwrap()
@@ -15,7 +27,7 @@ impl Parser {
 
     // check if next characters start with a symbol
     fn starts_with(&self, symbol: &str) -> bool {
-        self.next_char().eq(symbol)
+        self.input[self.pos..].starts_with(symbol)
     }
 
     // check if input has reached end of file
@@ -101,11 +113,49 @@ impl Parser {
         dom::elem(tag_name, attrs, children)
     }
 
+    // parse list of key-value pairs seperated by whitespace
     fn parse_attributes(&mut self) -> dom::AttrMap {
-        todo!()
+        let mut attributes = HashMap::new();
+        loop {
+            self.consume_whitespace();
+            if self.consume_char() == '>' {
+                break;
+            };
+            let (key, value) = self.parse_attr();
+            attributes.insert(key, value);
+        }
+        attributes
+    }
+
+    // parse a single attribute; key-value pair
+    fn parse_attr(&mut self) -> (String, String) {
+        let key = self.parse_tag_name();
+        assert_eq!(self.consume_char(), '=');
+        let value = self.parse_attr_value();
+        (key, value)
+    }
+
+    // parse quoted attribute value
+    fn parse_attr_value(&mut self) -> String {
+        let open_quote = self.consume_char();
+        assert!(open_quote == '"' || open_quote == '\'');
+        let value = self.consume_while(|char| char != open_quote);
+        assert_eq!(self.consume_char(), open_quote);
+        value
     }
 
     fn parse_nodes(&mut self) -> Vec<dom::Node> {
-        todo!()
+        let mut nodes: Vec<dom::Node> = Vec::new();
+
+        loop {
+            self.consume_whitespace();
+            if self.eof() || self.starts_with("</") {
+                break;
+            }
+
+            nodes.push(self.parse_node());
+        }
+
+        nodes
     }
 }
