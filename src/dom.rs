@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-enum NodeType {
+pub enum NodeType {
     Text(String),
     Element(ElementData)
 }
@@ -9,21 +9,21 @@ struct ElementData {
     attributes: AttrMap
 }
 
-type AttrMap = HashMap<String, String>;
+pub type AttrMap = HashMap<String, String>;
 
 #[derive(Debug)]
-struct Node {
+pub struct Node {
     // children under this node
     children: Vec<Node>,
     // the type of node this is
     nodeType: NodeType
 }
 
-fn text(data: String) -> Node {
+pub fn text(data: String) -> Node {
     Node { children: Vec::new(), nodeType: NodeType::Text(data) }
 }
 
-fn elem(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
+pub fn elem(name: String, attrs: AttrMap, children: Vec<Node>) -> Node {
     Node {
         children,
         nodeType: NodeType::Element(
