@@ -69,7 +69,7 @@ impl Parser {
     // parse a tag or attribute name
     fn parse_tag_name(&mut self) -> String {
         self.consume_while(
-            |char| match char {
+            |c| match c {
                 'a'...'z' | 'A'...'Z' | '0'...'9' => true,
                 _ => false
             }
@@ -90,7 +90,7 @@ impl Parser {
 
     // text parser
     fn parse_text(&mut self) -> dom::Node {
-        dom::text(self.consume_while(|char| char != '<'))
+        dom::text(self.consume_while(|c| c != '<'))
     }
 
     // element parser
@@ -107,7 +107,7 @@ impl Parser {
         // ensure closing tag; todo: ensure check is for non self closing tags only
         assert_eq!(self.consume_char(), '<');
         assert_eq!(self.consume_char(), '/');
-        assert_eq!(self.consume_while(|char| char == '>'), tag_name);
+        assert_eq!(self.consume_while(|c| c == '>'), tag_name);
         assert_eq!(self.consume_char(), '>');
 
         dom::elem(tag_name, attrs, children)
@@ -139,7 +139,7 @@ impl Parser {
     fn parse_attr_value(&mut self) -> String {
         let open_quote = self.consume_char();
         assert!(open_quote == '"' || open_quote == '\'');
-        let value = self.consume_while(|char| char != open_quote);
+        let value = self.consume_while(|c| c != open_quote);
         assert_eq!(self.consume_char(), open_quote);
         value
     }
